@@ -1,6 +1,6 @@
 (function() {
 
-  d3.json("/data/data.json", function(error, data) {
+  d3.json("../data/data.json", function(error, data) {
     configs = {};
     for (reservoirName in data) {
        console.log("parsing reservoirName: ", reservoirName)

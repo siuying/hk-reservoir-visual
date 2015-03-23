@@ -8,14 +8,33 @@ require_relative './lib/reservoir'
 
 helpers Sinatra::Handlebars
 
+configure do
+  set :cache, Dalli::Client.new((ENV["MEMCACHIER_SERVERS"] || "").split(","),
+                    {:username => ENV["MEMCACHIER_USERNAME"],
+                     :password => ENV["MEMCACHIER_PASSWORD"],
+                     :failover => true,
+                     :socket_timeout => 1.5,
+                     :socket_failure_delay => 0.2, 
+                     :expires_in => 60 * 60 * 24
+                    })
+end
+
+helpers do
+  def reservoirs
+    reservoirs = settings.cache.get('reservoirs.data')
+    unless reservoirs
+      reservoirs = Reservoir.data.values
+      settings.cache.set('reservoirs.data', reservoirs)
+    end
+    reservoirs    
+  end
+end
+
 get '/' do
-  @reservoirs = Reservoir.data.values
-  puts @reservoirs
-  handlebars :index, locals: {reservoirs: @reservoirs}
+  handlebars :index, locals: {reservoirs: reservoirs}
 end
 
 get '/data/data.json' do
   content_type 'application/json'
-  data = Reservoir.data
-  JSON.pretty_generate(data)
+  JSON.pretty_generate(reservoirs)
 end

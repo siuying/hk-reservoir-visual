@@ -5,3 +5,7 @@ gem "sinatra"
 gem 'tilt-handlebars'
 gem "puma"
 gem 'dalli'
+
+group :development do
+  gem 'foreman'
+end

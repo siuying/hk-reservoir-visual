@@ -9,6 +9,10 @@ require_relative './lib/reservoir'
 helpers Sinatra::Handlebars
 
 configure do
+  set :cache, nil
+end
+
+configure :production do
   set :cache, Dalli::Client.new((ENV["MEMCACHIER_SERVERS"] || "").split(","),
                     {:username => ENV["MEMCACHIER_USERNAME"],
                      :password => ENV["MEMCACHIER_PASSWORD"],
@@ -21,12 +25,17 @@ end
 
 helpers do
   def reservoirs
-    reservoirs = settings.cache.get('reservoirs.data')
-    unless reservoirs
-      reservoirs = Reservoir.data.values
-      settings.cache.set('reservoirs.data', reservoirs)
+    if settings.cache
+      reservoirs = settings.cache.get('reservoirs.data')
+      unless reservoirs
+        reservoirs = Reservoir.data.values
+        settings.cache.set('reservoirs.data', reservoirs)
+      end
+      reservoirs
+    else
+      puts("no cahce")
+      Reservoir.data.values
     end
-    reservoirs    
   end
 end
 

@@ -3,7 +3,7 @@
 ## Development
 
 ``
-bundle install
+bundle install  
 foreman start
 ``
 

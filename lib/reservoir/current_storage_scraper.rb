@@ -10,7 +10,8 @@ module Reservoir
 
     DISCARDED_ROWS = [
       "本港水塘總存水量(百萬立方米)", 
-      "佔總容量百分比(%)", "總和  :", 
+      "佔總容量百分比(%)", 
+      "總和  :", 
       "", 
       "TOTAL  :", 
       "Total Storage of Impounding Resevoirs(Million Cubic Metre)", 
@@ -33,11 +34,11 @@ module Reservoir
       current_storage_table = page.xpath("//table[contains(@summary, '本港水塘存水量') or contains(@summary, 'Storage Position')]").first
       current_storage_table.xpath("//tr").collect { |row|
         {
-          name: row.xpath("./td[1]").text,
-          storage: row.xpath("./td[2]").text.to_f,
-          percentage: row.xpath("./td[3]").text.to_f
+          "name" => row.xpath("./td[1]").text,
+          "storage" => row.xpath("./td[2]").text.to_f,
+          "percentage" => row.xpath("./td[3]").text.to_f
         }
-      }.select {|rows| !DISCARDED_ROWS.include?(rows[:name]) }
+      }.reject {|rows| DISCARDED_ROWS.include?(rows["name"]) }
     end
 
     def page

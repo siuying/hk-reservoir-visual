@@ -27,10 +27,10 @@ module Reservoir
       capacity_table = page.xpath("//table[contains(@summary, '各水塘容量') or contains(@summary, 'Capacity')]").first
       capacity_table.xpath("//tr").collect { |row|
         {
-          name: row.xpath("./td[1]").text,
-          capacity: row.xpath("./td[2]").text.to_f
+          "name" => row.xpath("./td[1]").text,
+          "volumn" => row.xpath("./td[2]").text.to_f
         }
-      }.select {|rows| !DISCARDED_ROWS.include?(rows[:name]) }
+      }.reject {|rows| DISCARDED_ROWS.include?(rows["name"]) }
     end
 
     def page
